@@ -5,27 +5,27 @@ import 'services/ocorrencia_service.dart';
 import 'services/auth_service.dart';
 import 'models/ocorrencia_model.dart';
 import 'vizualizar_ocorrencia.dart';
- 
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
- 
+
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
- 
+
 class _HomeScreenState extends State<HomeScreen> {
   int selectedIndex = 0;
   final OcorrenciaService _ocorrenciaService = OcorrenciaService();
   String? userRm;
   late Future<List<Ocorrencia>> _futureOcorrencias;
-  
+
   @override
   void initState() {
     super.initState();
     _loadUserRm();
     _loadOcorrencias();
   }
-  
+
   Future<void> _loadUserRm() async {
     final rm = await AuthService.getCurrentUserRm();
     setState(() {
@@ -36,14 +36,14 @@ class _HomeScreenState extends State<HomeScreen> {
   void _loadOcorrencias() {
     final isPending = selectedIndex == 0;
     _futureOcorrencias = isPending
-        ? _ocorrenciaService.getOcorrenciasPendentes()
-        : _ocorrenciaService.getOcorrenciasSolucionadas();
+        ? _ocorrenciaService.getOcorrenciaPendentes()
+        : _ocorrenciaService.getOcorrenciaSolucionadas();
   }
-  
+
   @override
   Widget build(BuildContext context) {
     final isPending = selectedIndex == 0;
- 
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -83,7 +83,9 @@ class _HomeScreenState extends State<HomeScreen> {
               Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  isPending ? 'HISTÓRICO DE PENDENTES:' : 'HISTÓRICO DE SOLUCIONADAS:',
+                  isPending
+                      ? 'HISTÓRICO DE PENDENTES:'
+                      : 'HISTÓRICO DE SOLUCIONADAS:',
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
@@ -155,7 +157,7 @@ class _HomeScreenState extends State<HomeScreen> {
       bottomNavigationBar: _buildBottomBar(),
     );
   }
-  
+
   Widget _buildButton(String text, {required bool ativo}) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
@@ -163,14 +165,18 @@ class _HomeScreenState extends State<HomeScreen> {
         color: const Color(0xFF0C1226),
         borderRadius: BorderRadius.circular(12),
         boxShadow: ativo
-            ? [const BoxShadow(color: Colors.black38, blurRadius: 4, offset: Offset(2, 2))]
+            ? [
+                const BoxShadow(
+                    color: Colors.black38, blurRadius: 4, offset: Offset(2, 2))
+              ]
             : [],
       ),
       child: Text(text,
-          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          style: const TextStyle(
+              color: Colors.white, fontWeight: FontWeight.bold)),
     );
   }
- 
+
   Widget _buildTitleBox(String text) {
     return Container(
       width: double.infinity,
@@ -181,26 +187,29 @@ class _HomeScreenState extends State<HomeScreen> {
           style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
     );
   }
- 
+
   Widget _buildCard({required Ocorrencia ocorrencia, required bool isPending}) {
     final status = isPending ? 'PENDENTE' : 'SOLUCIONADA';
     final color = isPending ? const Color(0xFFD32F2F) : Colors.green;
     final bgColor = isPending ? const Color(0xFFFFE5E5) : Colors.green[100]!;
-    
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: bgColor,
         borderRadius: BorderRadius.circular(12),
-        boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 4, offset: Offset(2, 2))],
+        boxShadow: const [
+          BoxShadow(color: Colors.black26, blurRadius: 4, offset: Offset(2, 2))
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Data De Envio: ${ocorrencia.dataEnvio.day}/${ocorrencia.dataEnvio.month}/${ocorrencia.dataEnvio.year}'),
+          Text(
+              'Data De Envio: ${ocorrencia.dataOcorrencia.day}/${ocorrencia.dataOcorrencia.month}/${ocorrencia.dataOcorrencia.year}'),
           Text('Nº Da Ocorrência: ${ocorrencia.id}'),
-          Text('Lab: ${ocorrencia.laboratorio} - ${ocorrencia.andar}'),
+          Text('Lab: ${ocorrencia.localidade.nome}'),
           const SizedBox(height: 8),
           Text('Status: $status',
               style: TextStyle(color: color, fontWeight: FontWeight.bold)),
@@ -208,7 +217,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
- 
+
   Widget _buildCriarOcorrenciaButton() {
     return ElevatedButton.icon(
       style: ElevatedButton.styleFrom(
@@ -222,7 +231,7 @@ class _HomeScreenState extends State<HomeScreen> {
           context,
           MaterialPageRoute(builder: (context) => const CriarOcorrenciaPage()),
         );
-        
+
         // Se uma nova ocorrência foi criada, atualizar a tela
         if (resultado != null) {
           setState(() {
@@ -231,10 +240,11 @@ class _HomeScreenState extends State<HomeScreen> {
         }
       },
       icon: const Icon(Icons.add, color: Colors.black),
-      label: const Text('CRIAR OCORRÊNCIA', style: TextStyle(color: Colors.black)),
+      label:
+          const Text('CRIAR OCORRÊNCIA', style: TextStyle(color: Colors.black)),
     );
   }
- 
+
   Widget _buildBottomBar() {
     return Container(
       color: const Color(0xFF0C1226),
@@ -244,10 +254,8 @@ class _HomeScreenState extends State<HomeScreen> {
           const Icon(Icons.account_circle, color: Colors.white),
           const SizedBox(width: 8),
           Expanded(
-            child: Text(
-              userRm != null ? 'RM: $userRm' : 'Carregando...',
-              style: const TextStyle(color: Colors.white)
-            ),
+            child: Text(userRm != null ? 'RM: $userRm' : 'Carregando...',
+                style: const TextStyle(color: Colors.white)),
           ),
           GestureDetector(
             onTap: () async {

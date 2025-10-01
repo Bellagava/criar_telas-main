@@ -1,47 +1,42 @@
+import 'package:criar_telas/models/localidade_model.dart';
+import 'package:criar_telas/models/usuario_model.dart';
+
 class Ocorrencia {
   final int id;
-  final String laboratorio;
-  final String andar;
-  final String problema;
-  final String patrimonio;
-  final String? fotoNome;
-  final DateTime dataEnvio;
-  bool resolvida;
+  final Usuario usuario;
+  final Localidade localidade;
+  final DateTime dataOcorrencia;
+  final String descricao;
+  final String statusOcorrencia;
 
   Ocorrencia({
     required this.id,
-    required this.laboratorio,
-    required this.andar,
-    required this.problema,
-    required this.patrimonio,
-    this.fotoNome,
-    required this.dataEnvio,
-    this.resolvida = false,
+    required this.usuario,
+    required this.localidade,
+    required this.dataOcorrencia,
+    required this.descricao,
+    required this.statusOcorrencia,
   });
+
+  factory Ocorrencia.fromMap(Map<String, dynamic> map) {
+    return Ocorrencia(
+      id: map['id'],
+      usuario: Usuario.fromMap(map['usuario']),
+      localidade: Localidade.fromMap(map['localidade']),
+      dataOcorrencia: DateTime.parse(map['dataOcorrencia']),
+      descricao: map['descricao'],
+      statusOcorrencia: map['statusOcorrencia'],
+    );
+  }
 
   Map<String, dynamic> toMap() {
     return {
       'id': id,
-      'laboratorio': laboratorio,
-      'andar': andar,
-      'problema': problema,
-      'patrimonio': patrimonio,
-      'fotoNome': fotoNome,
-      'dataEnvio': dataEnvio.toIso8601String(),
-      'resolvida': resolvida ? 1 : 0,
+      'usuario': usuario.toMap(),
+      'localidade': localidade.toMap(),
+      'dataOcorrencia': dataOcorrencia.toIso8601String(),
+      'descricao': descricao,
+      'statusOcorrencia': statusOcorrencia,
     };
-  }
-
-  factory Ocorrencia.fromMap(Map<String, dynamic> map) {
-    return Ocorrencia(
-      id: map['id'] is int ? map['id'] : int.tryParse('${map['id']}') ?? 0,
-      laboratorio: map['laboratorio'] ?? '',
-      andar: map['andar'] ?? '',
-      problema: map['problema'] ?? '',
-      patrimonio: map['patrimonio'] ?? '',
-      fotoNome: map['fotoNome'],
-      dataEnvio: DateTime.parse(map['dataEnvio']),
-      resolvida: map['resolvida'] == 1 || map['resolvida'] == true,
-    );
   }
 }
